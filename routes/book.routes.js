@@ -28,4 +28,18 @@ router.get("/books", (req, res, next) => {
 });
 
 
+router.get("/books/:bookId", (req, res, next) => {
+  const id = req.params.bookId;
+  Book.findById(id)
+    .then(bookDetails => {
+      console.log(bookDetails);
+      res.render("books/book-details", { book: bookDetails });
+
+    })
+    .catch(err => {
+      console.log("error getting book datails from DB", err);
+      next(err)
+    })
+})
+
 module.exports = router;
