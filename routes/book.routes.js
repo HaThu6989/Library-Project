@@ -27,6 +27,12 @@ router.get("/books", (req, res, next) => {
 
 });
 
+//Phải đặt trc router.get("/books/:bookId", (req, res, next), vì kế thừ lại code 
+router.get("/books/create", (req, res, next) => {
+  res.render("books/book-create")
+})
+
+
 
 router.get("/books/:bookId", (req, res, next) => {
   const id = req.params.bookId;
@@ -41,5 +47,29 @@ router.get("/books/:bookId", (req, res, next) => {
       next(err)
     })
 })
+
+
+
+router.post("/books/create", (req, res, next) => {
+  console.log(req.body); //{title: book new,...}
+  const newBook = {
+    title: req.body.title,
+    author: req.body.author,
+    description: req.body.description,
+    rating: req.body.rating,
+  };
+
+  Book.create(newBook)
+    .then(bookFromDB => {
+      res.redirect("/books"); //redirect to the products page
+      // console.log(newProduct)
+    })
+    .catch(err => {
+      console.log("error creating new book on DB", err);
+      next(err)
+    });
+})
+
+
 
 module.exports = router;
