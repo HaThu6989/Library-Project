@@ -1,12 +1,15 @@
 const Book = require("../models/Book.model");
+const Author = require("../models/Author.model");
 
 const router = require("express").Router();
 
 
 // READ: display list of books
-router.get("/books", (req, res, next) => {
+router.get("/", (req, res, next) => {
   Book.find()
+    .populate("author") //Muốn chạy populate => require Author
     .then((booksArr) => {
+
       res.render("books/books-list", { books: booksArr });
     })
     .catch(err => {
@@ -16,16 +19,25 @@ router.get("/books", (req, res, next) => {
 });
 
 
+
+
 // CREATE: render form
-router.get("/books/create", (req, res, next) => {
-  res.render("books/book-create");
+router.get("/create", (req, res, next) => {
+  Author.find()
+    .then((authorsArr) => {
+      // console.log(authorsArr)//data in MongoDB
+      res.render("books/book-create", { authors: authorsArr });
+    })
+    .catch(err => {
+      console.log("error getting authors from DB", err)
+      next(err);
+    });
 })
 
 
 // CREATE: process form
-//"/books/create" luon dung trc "/books/:bookId" : router.get("/books/:bookId", (req, res, next)
-//neu ko => error
-router.post("/books/create", (req, res, next) => {
+//"/books/create" luon dung trc "/books/:bookId" 
+router.post("/create", (req, res, next) => {
 
   const newBook = {
     title: req.body.title,
@@ -35,7 +47,9 @@ router.post("/books/create", (req, res, next) => {
   }
 
   Book.create(newBook)
+    // .populate("author")
     .then((bookFromDB) => {
+      console.log(bookFromDB)
       res.redirect("/books");
     })
     .catch(err => {
@@ -47,10 +61,11 @@ router.post("/books/create", (req, res, next) => {
 
 
 // READ: display book details
-router.get("/books/:bookId", (req, res, next) => {
+router.get("/:bookId", (req, res, next) => {
   const id = req.params.bookId;
 
   Book.findById(id)
+    .populate("author")
     .then((bookDetails) => {
       res.render("books/book-details", bookDetails);
     })
@@ -62,7 +77,7 @@ router.get("/books/:bookId", (req, res, next) => {
 
 
 // UPDATE: display form
-router.get("/books/:bookId/edit", (req, res, next) => {
+router.get("/:bookId/edit", (req, res, next) => {
   const id = req.params.bookId;
   Book.findById(id)
     .then((bookDetails) => {
@@ -77,7 +92,7 @@ router.get("/books/:bookId/edit", (req, res, next) => {
 
 
 // UPDATE: process form
-router.post("/books/:bookId/edit", (req, res, next) => {
+router.post("/:bookId/edit", (req, res, next) => {
 
   const id = req.params.bookId;
 
@@ -99,7 +114,7 @@ router.post("/books/:bookId/edit", (req, res, next) => {
 });
 
 //DELETE
-router.post("/books/:bookId/delete", (req, res, next) => {
+router.post("/:bookId/delete", (req, res, next) => {
   const id = req.params.bookId;
   Book.findByIdAndRemove(id,)
     .then((response) => {
