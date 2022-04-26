@@ -29,7 +29,10 @@ const index = require("./routes/index.routes");
 app.use("/", index);
 
 const bookRoutes = require("./routes/book.routes");
-app.use("/", bookRoutes)
+app.use("/books", bookRoutes);
+
+const authorRoutes = require("./routes/author.routes");
+app.use("/authors", authorRoutes)
 
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
