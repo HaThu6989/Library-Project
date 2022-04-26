@@ -11,6 +11,11 @@ h1 {
   color: 15px;
 }
 
+form {
+  display: block;
+  margin: 1rem auto;
+}
+
 .book-summary {
   background-color: #ddd;
   border: 1px solid #333;
