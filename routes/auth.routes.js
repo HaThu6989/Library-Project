@@ -5,12 +5,13 @@ const User = require("../models/User.model");
 
 const saltRounds = 10;
 
-// REGISTER: display form
+
+//REGISTRATION: display form
 router.get("/register", (req, res, next) => {
   res.render("auth/register");
 });
 
-// REGISTER: process form
+//REGISTRATION: process form
 router.post("/register", (req, res, next) => {
 
   const { email, password } = req.body;
@@ -35,7 +36,6 @@ router.post("/register", (req, res, next) => {
       return User.create(userDetails)
     })
     .then(userFromDB => {
-      // res.send("user was created")
       res.redirect("/login")
     })
     .catch(error => {
@@ -46,9 +46,9 @@ router.post("/register", (req, res, next) => {
 });
 
 
-// LOGIN: display form
+//LOGIN: display form
 router.get("/login", (req, res, next) => {
-  res.render("auth/login")
+  res.render("auth/login");
 })
 
 //LOGIN: process form
@@ -70,7 +70,6 @@ router.post("/login", (req, res, next) => {
       } else if (bcryptjs.compareSync(password, userFromDB.passwordHash)) {
         //login sucessful
         req.session.currentUser = userFromDB;
-        // res.render("auth/user-profile", { user : req.session.currentUser});
         res.redirect("/user-profile");
       } else {
         //login failed (password doesn't match)
@@ -86,14 +85,15 @@ router.post("/login", (req, res, next) => {
 
 //PROFILE PAGE
 router.get('/user-profile', (req, res, next) => {
-  console.log(req.session)
-  res.render('auth/user-profile', { user: req.session.currentUser });
+  res.render('auth/user-profile');
 });
 
 //LOGOUT
 router.post('/logout', (req, res, next) => {
   req.session.destroy(err => {
-    if (err) next(err);
+    if (err) {
+      next(err);
+    };
     res.redirect('/');
   });
 });

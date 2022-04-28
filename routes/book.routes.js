@@ -3,13 +3,13 @@ const Author = require("../models/Author.model");
 
 const router = require("express").Router();
 
+const { isLoggedIn } = require("../middleware/route-guard");
 
 // READ: display list of books
 router.get("/", (req, res, next) => {
   Book.find()
-    .populate("author") //Muốn chạy populate => require Author
+    .populate("author")
     .then((booksArr) => {
-
       res.render("books/books-list", { books: booksArr });
     })
     .catch(err => {
@@ -19,13 +19,10 @@ router.get("/", (req, res, next) => {
 });
 
 
-
-
 // CREATE: render form
-router.get("/create", (req, res, next) => {
+router.get("/create", isLoggedIn, (req, res, next) => {
   Author.find()
     .then((authorsArr) => {
-      // console.log(authorsArr)//data in MongoDB
       res.render("books/book-create", { authors: authorsArr });
     })
     .catch(err => {
@@ -36,8 +33,7 @@ router.get("/create", (req, res, next) => {
 
 
 // CREATE: process form
-//"/books/create" luon dung trc "/books/:bookId" 
-router.post("/create", (req, res, next) => {
+router.post("/create", isLoggedIn, (req, res, next) => {
 
   const newBook = {
     title: req.body.title,
@@ -47,9 +43,7 @@ router.post("/create", (req, res, next) => {
   }
 
   Book.create(newBook)
-    // .populate("author")
     .then((bookFromDB) => {
-      console.log(bookFromDB)
       res.redirect("/books");
     })
     .catch(err => {
@@ -65,7 +59,6 @@ router.get("/:bookId", (req, res, next) => {
   const id = req.params.bookId;
 
   Book.findById(id)
-    .populate("author")
     .then((bookDetails) => {
       res.render("books/book-details", bookDetails);
     })
@@ -77,14 +70,14 @@ router.get("/:bookId", (req, res, next) => {
 
 
 // UPDATE: display form
-router.get("/:bookId/edit", (req, res, next) => {
+router.get("/:bookId/edit", isLoggedIn, (req, res, next) => {
   const id = req.params.bookId;
   Book.findById(id)
     .then((bookDetails) => {
       res.render("books/book-edit", bookDetails);
     })
     .catch(err => {
-      console.log("error updating book from DB", err)
+      console.log("error getting book details from DB", err)
       next(err);
     });
 });
@@ -92,7 +85,7 @@ router.get("/:bookId/edit", (req, res, next) => {
 
 
 // UPDATE: process form
-router.post("/:bookId/edit", (req, res, next) => {
+router.post("/:bookId/edit", isLoggedIn, (req, res, next) => {
 
   const id = req.params.bookId;
 
@@ -113,17 +106,21 @@ router.post("/:bookId/edit", (req, res, next) => {
     });
 });
 
-//DELETE
-router.post("/:bookId/delete", (req, res, next) => {
+
+
+// DELETE.
+router.post("/:bookId/delete", isLoggedIn, (req, res, next) => {
   const id = req.params.bookId;
-  Book.findByIdAndRemove(id,)
-    .then((response) => {
-      res.redirect("/books/");
+  Book.findByIdAndRemove(id)
+    .then(response => {
+      res.redirect("/books");
     })
     .catch(err => {
-      console.log("error deleting book in DB", err)
+      console.log("error deleting book from DB", err);
       next(err);
     });
-})
+
+});
+
 
 module.exports = router;
