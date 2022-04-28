@@ -35,6 +35,10 @@ header {
   text-align: center;
 }
 
+header form {
+  display: inline-block;
+}
+
 .box {
   background-color: #eee;
   border: 1px solid #666;
